@@ -1,43 +1,4 @@
-/*
-  Some nice fake react stuff
-  Features:
-  - Automatic clean up
-  - Reactive listener patterns
-  - Sweet sweet ES6
-  - A this.window with auto listener clean up
-
-  Reactive _creation flow
-  _create -> * sets up reactive variables. *
-  react -> * this is where you set up your change listeners *
-  listen -> * this is where you set up your actions (anything that calls setState) *
-  firstReaction(initialState) * reactive will run your listeners through with the initial state (note: if you are listening to 'x' and 'y' but only y is set in the initial state only the 'y' listener will run with the initial state)
-  (listen)action -> reaction * actions will fire setStates which will fire your listeners and allow you to update your app 
-
-  eg:
-    _create(){
-      this.state = {
-        y: 0
-      }
-    },
-    react(){
-      * In this case keeps the element inline with the mouse
-      this.change('y', (prevState, newState, this) => {
-        this.element.css({top: this.state.y})
-      })
-    },
-    * Think of this as being the same as the 'inline' listeners you have in react
-    listen(){
-      this.element.on('mousemove', e => this.setState({y: e.clientY}))
-    }
-
-  Also when a component unmounts it can no longer react to things, so there is no need to unlisten to changes!
-  (Although all listeners are still deleted anyway)
-
-  Other components can also listen to this components state through Site.findWidget('thisWidget').change('y', myFunc)
-  This makes it incredibly easy to react to other widgets internal state
-*/
-
-export default function (opts = {}){
+export default function config(opts = {}){
   return function reactive(Site, $, name, self){
     const log = opts.log ? (...args) => console.log('Reactive.js\n', ...args) : () => {}
 
