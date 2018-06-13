@@ -25,9 +25,9 @@ export default function config (opts) {
           render: () => {
             if(this._knockout.isFirst){
               let html = this.element.html()
-              const matches = html.match(/{{(.+?)}}/g)
+              const matches = html.match(/\${(.+?)}|{{(.+?)}}/g)
               const result = matches.reduce((res, match) => {
-                const prop = match.replace(/{|}/g, '')
+                const prop = match.replace(/{{|}}|\${|}/g, '')
                 return res.replace(new RegExp(match), `<span data-knockout-id="${prop}">${target(this.state).get(prop) || ''}</span>`)
               }, html)
 
