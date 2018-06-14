@@ -8,31 +8,20 @@ yarn add sitekit-extensions
 
 If using npm type:
 ```sh
-npm i sitekit-extensions
+npm i sitekit-extensions -add
 ```
 
 ## Usage
-To begin using the extensions you must first patch your Site instance.
-You can do this by
-```javascript
-import { patch } from 'sitekit-extensions'
+To begin usage just import the extensions you want to use and add them into your widgets `use: []` property
 
-patch(Site)
-```
-
-This allows you to use the `Site.use(...extensions).widget()` syntax
 
 An example of using the reactive and knockout widgets: 
 ```javascript
 import { reactive, knockout } from 'sitekit-extensions'
 
 export default function(Site, $){
-  Site
-    .use(
-      reactive(/*opts{}*/)
-      knockout(/*opts{}*/)
-    )
-    .widget('menuToggle', {
+  Site.widget('menuToggle', {
+      use: [reactive(), knockout()],
       _create(){}
       // etc
     })
