@@ -1,1 +1,1 @@
-modules.exports = require('./dist/bundle.js')
+module.exports = require('./dist/bundle.js')
