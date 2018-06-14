@@ -17,19 +17,23 @@ class StyleHandler{
     this.ready = true
     this.previousUpdate = {}
     this.stylesToUpdate = {}
+
+    ['enqueStyle', 'removeElement', 'doBatch', 'processString'].forEach(k => {
+      this[k] = this[k].bind(this)
+    })
   }
 
-  enqueStyle = (name, cssString) => {
+  enqueStyle(name, cssString){
     const css = this.processString(name, cssString)
     this.stylesToUpdate[name] = css
     this.doBatch()
   }
 
-  removeElement = (name) => {
+  removeElement(name){
     if(typeof this.stylesToUpdate[name] !== 'undefined') delete this.stylesToUpdate[name]
   }
 
-  doBatch = () => {
+  doBatch(){
     if(this.ready){
       window.requestAnimationFrame(() => {
 
@@ -61,7 +65,7 @@ class StyleHandler{
     }
   }
 
-  processString = (name, cssString) => {
+  processString (name, cssString){
     return stylis(name, cssString)
   }
 }
