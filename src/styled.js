@@ -6,6 +6,10 @@ const select = (selector) => {
   }
 }
 
+function bindTo(arr, self){
+  self[k] = self[k].bind(self)
+}
+
 const {keys} = Object
 class StyleHandler{
   constructor(){
@@ -18,9 +22,7 @@ class StyleHandler{
     this.previousUpdate = {}
     this.stylesToUpdate = {}
 
-    ['enqueStyle', 'removeElement', 'doBatch', 'processString'].forEach(k => {
-      this[k] = this[k].bind(this)
-    })
+    bindTo(['enqueStyle', 'removeElement', 'doBatch', 'processString'], this)
   }
 
   enqueStyle(name, cssString){
