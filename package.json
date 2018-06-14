@@ -1,6 +1,6 @@
 {
   "name": "sitekit-extensions",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -14,16 +14,16 @@
   "dependencies": {
     "stylis": "^3.5.0"
   },
-  "repository" : { 
-    "type" : "git", 
-    "url" : "https://github.com/brynshanahan/sitekit-extensions.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/brynshanahan/sitekit-extensions.git"
   },
   "devDependencies": {
     "babelify": "^7.3.0",
     "browserify": "^14.4.0",
     "gulp-watch": "^4.3.9",
     "jest": "^23.1.0",
-    "babel-preset-env": "^1.7.0"
-
+    "babel-preset-env": "^1.7.0",
+    "uglifyify": "^5.0.0"
   }
 }

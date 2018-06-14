@@ -3,6 +3,7 @@ var babelify = require('babelify');
 var fs = require('fs');
 var path = require('path');
 var gulpWatch = require('gulp-watch');
+var uglify = require('uglifyify')
 
 function transpile() {
   console.log("Transpiling to 'dist/bundle.js'...");
@@ -12,6 +13,7 @@ function transpile() {
     .transform(babelify.configure({
       presets: ["env"]
     }))
+    .transform('uglifyify', {global: true})
     .bundle()
     .pipe(fs.createWriteStream(path.resolve(__dirname, '../dist/bundle.js')));
 }
