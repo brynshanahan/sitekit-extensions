@@ -7,7 +7,9 @@ const select = (selector) => {
 }
 
 function bindTo(arr, self){
-  self[k] = self[k].bind(self)
+  arr.forEach(k => {
+    self[k] = self[k].bind(self)
+  })
 }
 
 const {keys} = Object
