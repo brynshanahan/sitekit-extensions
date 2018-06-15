@@ -17,14 +17,31 @@ To begin usage just import the extensions you want to use and add them into your
 
 An example of using the reactive and knockout widgets: 
 ```javascript
-import { reactive, knockout } from 'sitekit-extensions'
+import { reactive, mousemove } from 'sitekit-extensions'
 
-export default function(Site, $){
-  Site.widget('menuToggle', {
-      use: [reactive(), knockout()],
-      _create(){}
-      // etc
-    })
+export default function (Site, $){
+  Site.widget('mousepos', {
+    use: [
+      reactive(),
+      mousemove(),
+    ]
+    onMousemove({x, y}){
+      this.setState({
+        pos: {x, y}
+      })
+    }
+    react(){
+      this.changed('pos', (prevState, newState, self) => {
+        this.element.toggleClass('right', this.state.x > window.innerWidth / 2)
+      })
+
+      /* or use no namespace to react to all elements */
+
+      this.changed((prevState, newState, self) => {
+        this.element.toggleClass('left', this.state.x < window.innerWidth / 2)
+      })
+    }
+  })
 }
 
 
