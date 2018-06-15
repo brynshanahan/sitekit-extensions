@@ -37,7 +37,6 @@ export default function config (opts) {
 
                 this.element.find('[data-knockout-id]').each((i, el) => {
                   const prop = $(el).attr('data-knockout-id')
-                  console.log(el)
                   this.changed(prop, prevState => this._knockout.renderProp(prop, $(el)))                  
                 })
               }

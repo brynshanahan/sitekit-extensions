@@ -1726,7 +1726,6 @@ function config(opts) {
 
                 _this.element.find('[data-knockout-id]').each(function (i, el) {
                   var prop = $(el).attr('data-knockout-id');
-                  console.log(el);
                   _this.changed(prop, function (prevState) {
                     return _this._knockout.renderProp(prop, $(el));
                   });
