@@ -35,7 +35,7 @@ export default function (Site, $){
         this.element.toggleClass('right', this.state.x > window.innerWidth / 2)
       })
 
-      /* or use no namespace to react to all elements */
+      /* or use no namespace to react to all props */
 
       this.changed((prevState, newState, self) => {
         this.element.toggleClass('left', this.state.x < window.innerWidth / 2)
