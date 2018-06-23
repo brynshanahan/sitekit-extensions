@@ -13,7 +13,7 @@ function transpile() {
     .transform(babelify.configure({
       presets: ["env"]
     }))
-    // .transform('uglifyify', {global: true})
+    .transform('uglifyify', {global: true})
     .bundle()
     .pipe(fs.createWriteStream(path.resolve(__dirname, '../dist/bundle.js')));
 }
