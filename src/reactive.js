@@ -1,6 +1,6 @@
 export default function config(opts = {}){
   return function reactive(Site, $, name, self){
-    const log = opts.log ? (...args) => console.log('Reactive.js\n', ...args) : () => {}
+    const log = opts.log ? (...args) => console.log('Reactive.js:', ...args) : () => {}
 
     const errs = host(self).protectedProps('setState', 'doChanges', 'changed').errors()
   
@@ -10,21 +10,22 @@ export default function config(opts = {}){
     
     const mixin = {
       _create(){
+        log("REACTIVE INIT", this)
         this._reactive = {
           allChanges: {},
           changes: {},
           cancels: {},
           index: 0,
-          getKey(){
+          getKey: () => { 
             const key = `key${this._reactive.index++}`
             log(key)
             return key
           },
-          tearDown(host, key){
+          tearDown: (host, key) => {
             delete this._reactive.cancels[key]
             delete host[key]
           },
-          createWindow(){
+          createWindow: () => {
             log('created window')
             const $window = $(window)
             const on = $window.on
@@ -42,17 +43,19 @@ export default function config(opts = {}){
     
             return $window
           },
-          init () {
+          init: () => {
             log('init')
             if (!this.window) {
               this.window = this.createWindow()
             }
             // Set reactions up first
+            log('Is reacting', this.react)
             if (isFn(this.react)) {
               log('reacting')
               this.react()
             }
         
+            log('Is running this.listen', isFn(this.listen))
             // Set actions up second
             if (isFn(this.listen)) {
               log('listening')
