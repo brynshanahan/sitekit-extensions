@@ -7,78 +7,67 @@ export default function config(opts = {}){
     if (errs) {
       throw new Error(`Propert${errs.length > 1 ? 'ies' : 'y'} ${errs.map(err => `this.${err}`)} ${errs.length > 1 ? 'are' : 'is'} reserved for reactive()`)
     }
-
-    const _reactive = {
-      allChanges: {},
-      changes: {},
-      cancels: {},
-      index: 0,
-      getKey(){
-        const key = `key${this._reactive.index++}`
-        log(key)
-        return key
-      },
-      tearDown(host, key){
-        delete this._reactive.cancels[key]
-        delete host[key]
-      },
-      createWindow(){
-        log('created window')
-        const $window = $(window)
-        const on = $window.on
-
-        $window.on = function (e, fn, ...args) {
-          on(`${e}.${this.uuid}`, fn, ...args)
-
-          const newKey = this._reactive.getKey()
-          this._reactive.cancels[newKey] = () => {
-            delete this._reactive.cancels[newKey]
-            $(window).off(`${e}.${this.uuid}`, fn)
-          }
-          return this._reactive.cancels[newKey]
-        }
-
-        return $window
-      },
-      init () {
-        log('init')
-        if (!this.window) {
-          this.window = this.createWindow()
-        }
-        // Set reactions up first
-        if (isFn(this.react)) {
-          log('reacting')
-          this.react()
-        }
     
-        // Set actions up second
-        if (isFn(this.listen)) {
-          log('listening')
-          this.listen()
-        }
-    
-        // Run first reactions with initialState
-        if (isObject(this.state)) {
-          log('doing first state')
-          this.doChanges({}, Object.keys(this.state))
-        } else {
-          this.state = {}
-        }
-      }
-    }
-
-    function bindReactive(self){
-      Object.keys(self._reactive).forEach(key => {
-        if(typeof self._reactive[key] === 'function'){
-          self._reactive[key] = self._reactive[key].bind(self)
-        }
-      })
-    }
-
     const mixin = {
-      _reactive,
       _create(){
-        bindReactive(this)
+        this._reactive = {
+          allChanges: {},
+          changes: {},
+          cancels: {},
+          index: 0,
+          getKey(){
+            const key = `key${this._reactive.index++}`
+            log(key)
+            return key
+          },
+          tearDown(host, key){
+            delete this._reactive.cancels[key]
+            delete host[key]
+          },
+          createWindow(){
+            log('created window')
+            const $window = $(window)
+            const on = $window.on
+    
+            $window.on = function (e, fn, ...args) {
+              on(`${e}.${this.uuid}`, fn, ...args)
+    
+              const newKey = this._reactive.getKey()
+              this._reactive.cancels[newKey] = () => {
+                delete this._reactive.cancels[newKey]
+                $(window).off(`${e}.${this.uuid}`, fn)
+              }
+              return this._reactive.cancels[newKey]
+            }
+    
+            return $window
+          },
+          init () {
+            log('init')
+            if (!this.window) {
+              this.window = this.createWindow()
+            }
+            // Set reactions up first
+            if (isFn(this.react)) {
+              log('reacting')
+              this.react()
+            }
+        
+            // Set actions up second
+            if (isFn(this.listen)) {
+              log('listening')
+              this.listen()
+            }
+        
+            // Run first reactions with initialState
+            if (isObject(this.state)) {
+              log('doing first state')
+              this.doChanges({}, Object.keys(this.state))
+            } else {
+              this.state = {}
+            }
+          }
+        }
         this._reactive.init()
       },
       _destroy(){

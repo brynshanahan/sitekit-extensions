@@ -1,10 +1,14 @@
-const { values } = Object
-
 const defaultOpts = {
   log: false
 }
 
-const events = [
+const requestAnimationFrame = fn => setTimeout(fn, 60);
+
+let i = 0
+
+const doTick = fn => new Promise(resolve => window.requestAnimationFrame(() => resolve(fn.apply(null, arguments))))
+
+const eventsNames = [
   {e:'MouseDown'},
   {e:'MouseMove', window: true},
   {e:'MouseUp', window: true},
@@ -19,6 +23,7 @@ const events = [
 
 const doFn = fn => fn()
 
+
 export default function eventsConfig(options = {}){
   const opts = Object.assign({}, defaultOpts, options)
   const log = opts.log ? console.log : () => {}
@@ -30,9 +35,10 @@ export default function eventsConfig(options = {}){
           cancels: {},
           index: 0,
         }
+        const self = this
         const getKey = () => `eve${this._events.index++}`
 
-        events.forEach(obj => {
+        eventsNames.forEach(obj => {
           const {e} = obj
           const eve = 'on' + e
 
@@ -58,7 +64,7 @@ export default function eventsConfig(options = {}){
                 if(!ready) return
 
                 ready = false
-                const res = fn(...args)
+                const res = fn.apply(self, args)
 
                 // If you return null the functino will get removed
                 if(res === null){
@@ -88,7 +94,7 @@ export default function eventsConfig(options = {}){
 
                 if(!ready) return
                 ready = false
-                const res = fn(...args)
+                const res = fn.apply(self, args)
                 
                 // If you return null the functino will get removed
                 if(res === null){
@@ -107,9 +113,35 @@ export default function eventsConfig(options = {}){
             }
           }
         })
+
+        this._events.raf = (fn) => {
+          return new Promise(resolve => {
+            window.requestAnimationFrame(() => {
+              const res = fn.apply(undefined, arguments)
+              resolve(res)
+            })
+          })
+        }
+      },
+      async onTick(fn){
+        // raf is set to null when the component unmounts
+        if(this._events.raf === null) return
+        if(typeof this._events.raf === 'number') return this.onTick(fn)
+        // Dont queue another raf while a raf is still going
+        if(this._events.raf) return 
+        const res = await doTick(fn)
+        // debounce if we have recieve a number
+        if(typeof res === 'number'){
+          this._events.raf = res
+          setTimeout(() => {
+            this._events.raf = undefined
+          }, res)
+        }
+        if(res) this.onTick(fn)
       },
       _destroy(){
-        values(this._events.cancels)
+        this._events.raf = null
+        Object.values(this._events.cancels)
           .forEach(doFn)
       }
     }
