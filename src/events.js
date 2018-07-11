@@ -1,35 +1,32 @@
+import merge from 'deepmerge'
+
 const defaultOpts = {
-  log: false
+  log: false,
+  tapLength: 200,
 }
 
-const requestAnimationFrame = fn => setTimeout(fn, 60);
-
-let i = 0
-
-const doTick = fn => new Promise(resolve => window.requestAnimationFrame(() => resolve(fn.apply(null, arguments))))
-
-const eventsNames = [
-  {e:'MouseDown'},
-  {e:'MouseMove', window: true},
-  {e:'MouseUp', window: true},
-  {e:'MouseOut'},
-  {e:'MouseOver'},
-  {e:'TouchStart'},
-  {e:'TouchEnd'},
-  {e:'Scroll', window: true},
-  {e:'Resize', window: true},
-  {e:'TouchMove'},
-  {e: 'Click'},
-]
-
-const doFn = fn => fn()
-
-
 export default function eventsConfig(options = {}){
-  const opts = Object.assign({}, defaultOpts, options)
-  const log = opts.log ? console.log : () => {}
+  const opts = merge(defaultOpts, options)
+  const log = getLogger(opts.log)
 
   return function events(Site, $, name, def){
+
+    const eventsNames = [
+      {e:'MouseDown'},
+      {e:'MouseMove', window: true},
+      {e:'MouseUp', window: true},
+      {e:'MouseLeave'},
+      {e:'MouseEnter'},
+      {e: 'MouseOver'},
+      {e:'TouchStart'},
+      {e:'TouchEnd'},
+      {e:'Scroll', window: true},
+      {e:'Resize', window: true},
+      {e:'TouchMove'},
+      {e: 'Click'},
+      {e: 'Hover', alias: 'mouseenter mouseleave'},
+    ]
+
     return {
       _create(){
         this._events = {
@@ -42,6 +39,7 @@ export default function eventsConfig(options = {}){
         eventsNames.forEach(obj => {
           const {e} = obj
           const eve = 'on' + e
+          const eventName = obj.alias || e.toLowerCase()
 
           if(typeof this[eve] === 'function'){
             const key = getKey()
@@ -53,13 +51,13 @@ export default function eventsConfig(options = {}){
               // Set up cancel function
               const stop = () => {
                 delete this._events.cancels[key]
-                $(window).off(e.toLowerCase(), fn)
+                $(window).off(eventName, fn)
               }
               // Add it to the cancel callback thing
               this._events.cancels[key] = stop
 
               // Listen to the event
-              $(window).on(e.toLowerCase(), (...args) => {
+              $(window).on(eventName, (...args) => {
 
                 // If we have a debounce thing
                 if(!ready) return
@@ -86,20 +84,21 @@ export default function eventsConfig(options = {}){
               // Set up cancel function
               const stop = () => {
                 delete this._events.cancels[key]
-                $(window).off(e.toLowerCase(), fn)
+                $(window).off(eventName, fn)
               }
 
               this._events.cancels[key] = stop
 
-              this.element.on(e, (...args) => {
+              this.element.on(eventName, (...args) => {
 
                 if(!ready) return
                 ready = false
+
                 const res = fn.apply(self, args)
                 
-                // If you return null the functino will get removed
+                // If you return null the function will get removed
                 if(res === null){
-                  stop()
+                  return stop()
                 }
 
                 // If a number is returned and it's not 0
@@ -148,4 +147,17 @@ export default function eventsConfig(options = {}){
     }
     
   }
+}
+
+function noop(){}
+function doFn(fn){return fn()}
+function doTick(fn){return new Promise(resolve => window.requestAnimationFrame(() => resolve(fn.apply(null, arguments))))}
+function getLogger(opts){
+  if(opts.log && typeof opts.log === 'function'){
+    return opts.log
+  }
+  if(opts.log){
+    return console.log
+  }
+  return noop
 }
