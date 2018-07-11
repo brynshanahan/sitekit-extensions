@@ -19,6 +19,7 @@ const eventsNames = [
   {e:'Scroll', window: true},
   {e:'Resize', window: true},
   {e:'TouchMove'},
+  {e: 'Click'},
 ]
 
 const doFn = fn => fn()
